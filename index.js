@@ -1,40 +1,35 @@
 var rs = require('readline-sync');
 
-let result = performOperation();
-console.log(`The result is ${result}!`)
-
-function performOperation() {
-  let result = 0;
-
-  const executeOperation = () => {
-    console.log('What operation would you like to perform?')
-  
-    rs.promptCL(function(num1, operation, num2) {
-      let number1 = parseInt(num1);
-      let number2 = parseInt(num2);
-  
-      if (!number1 || !number2) {
-        console.log('Invalid numbers. Please format your request like this: 6 + 1');
-        executeOperation();
-        return;
-      }
-  
-      if (operation === '/') {
-        result = number1 / number2
-      } else if (operation === '*') {
-        result = number1 * number2
-      } else if (operation === '-') {
-        result = number1 - number2
-      } else if (operation === '+'){
-        result = number1 + number2
-      } else {
-        console.log('That is not a valid operation. Choose from [ /, *, -, + ]');
-        executeOperation();
-        return;
-      }
-    });
-  }
-  executeOperation();
-
-  return result;
+const objOperations = {
+  '+': (num1, num2) => num1 + num2,
+  '-': (num1, num2) => num1 - num2,
+  '*': (num1, num2) => num1 * num2,
+  '/': (num1, num2) => num1 / num2
 }
+
+const getOperation = (operations) => {
+  return rs.question('What operation would you like to perform? ', { 
+    limit: operations,
+    limitMessage: `That is not a valid operation. Please choose from [ ${operations.join(', ')} ]`
+  });
+}
+
+const getNumber = (order) => {
+  return rs.questionInt(`Please enter the ${order} number: `, {
+    limitMessage: 'This is not a number.'
+  });
+}
+
+const performOperation = (operationObj, operation, num1, num2) => {
+  return operationObj[operation](num1, num2);
+}
+
+const calculate = (operationsObj) => {
+  const arrOperations = Object.keys(objOperations);
+  const operation = getOperation(arrOperations);
+  const [num1, num2] = ['first', 'second'].map((order) => getNumber(order));
+  const result = performOperation(operationsObj, operation, num1, num2)
+  console.log(`The result is ${result}!`)
+}
+
+calculate(objOperations);
